@@ -18,9 +18,9 @@ def traverse_dir(input_list):
                 if p.is_dir():
                     user_name = pwd.getpwuid(p.stat().st_uid).pw_name
                     if result_dict.get(user_name):
-                        result_dict[user_name].append(p)
+                        result_dict[user_name].append(str(p.absolute()))
                     else:
-                        result_dict[user_name] = [p]
+                        result_dict[user_name] = [str(p.absolute())]
     return result_dict
 
 def main():
