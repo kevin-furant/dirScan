@@ -1,0 +1,7 @@
+"./a.txt"	0B	0	0
+"./main.cpp"	676B	38	0
+"./note.fxk"	160B	38	0
+"./userDirScanner"	2.5MB (2612888)	38	0
+"./a.permission_denied.tsv"	0B	38	0
+"./userDirScanner.cpp"	2.5KB (2545)	38	0
+"./userDirScanner.h"	236B	38	0

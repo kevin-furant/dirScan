@@ -1,0 +1,2 @@
+g++ -O2 -o userDirScanner -std=c++20 -static main.cpp userDirScanner.cpp
+./userDirScanner /jdfstj6/B2C_RD/chenqing1/Capture-probe/Data-pmplus/V6.4.0/stat c.tsv

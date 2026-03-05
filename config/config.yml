@@ -1,0 +1,75 @@
+workdir: /public/work/Personal/fuxiangke/dirScan
+pipe_path: /public/work/Personal/fuxiangke/pipeline/userDirScanner
+targetDir:
+    bijinpeng:
+    - /public/work/Personal/bijinpeng
+    chenzhiqiang:
+    - /public/work/Personal/chenzhiqiang
+    - /public/work/Personal/GPU_GATK_RUNinf
+    dengshuhan:
+    - /public/work/Personal/liuboxin
+    - /public/work/Personal/liujinxu
+    - /public/work/Personal/dengshuhan
+    fuxiangke:
+    - /public/work/Personal/fuxiangke
+    gaoying:
+    - /public/work/Personal/gaoying
+    huanghuanwei:
+    - /public/work/Personal/huanghw
+    langdandan:
+    - /public/work/Personal/langdandan
+    lianglunping:
+    - /public/work/Personal/lianglunping
+    liangqiqi:
+    - /public/work/Personal/liangqiqi
+    lishangtong:
+    - /public/work/Personal/lishangtong
+    liuhongling:
+    - /public/work/Personal/liuhongling
+    liuxiaotong:
+    - /public/work/Personal/liuxiaotong
+    - /public/work/Personal/chenyinghui
+    - /public/work/Personal/yiyaoran
+    liuzhexin:
+    - /public/work/Personal/ZhexinLiu
+    liuzhiming:
+    - /public/work/Personal/liuzhiming
+    mamengyao:
+    - /public/work/Personal/mengyaoma
+    pangshuai:
+    - /public/work/Personal/pangshuai
+    renxiaozhen:
+    - /public/work/Personal/renxiaozhen
+    seq_auto:
+    - /public/work/Personal/QC_auto
+    - /public/work/Personal/QC_out
+    - /public/work/Personal/test
+    songyue:
+    - /public/work/Personal/songyue
+    tanmeng:
+    - /public/work/Personal/tanmeng
+    wangdi:
+    - /public/work/Personal/wangdi
+    wangkailai:
+    - /public/work/Personal/wangkailai
+    wanglulu:
+    - /public/work/Personal/wanglulu
+    wuxu:
+    - /public/work/Personal/wuxu
+    xiaoyu:
+    - /public/work/Personal/xiaoyu
+    xiemengjia:
+    - /public/work/Personal/wangkailai
+    - /public/work/Personal/xiemengjia
+    yanglingyun:
+    - /public/work/Personal/yanglingyun
+    yuyuye:
+    - /public/work/Personal/yuyuye
+    zhangjibin:
+    - /public/work/Personal/zhangjibin
+    zhangyi:
+    - /public/work/Personal/zhangyi
+    zhangzhichao:
+    - /public/work/Personal/zhangzhichao
+    zhuyunke:
+    - /public/work/Personal/zhuyunke
