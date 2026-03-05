@@ -8,16 +8,19 @@ from pathlib import Path
 import pwd
 import yaml
 
-def traverse_dir(input_dir):
+def traverse_dir(input_list):
     "遍历目录,按key为属主将目录存放到字典中"
     result_dict = []
-    for p in input_dir.iterdir():
-        if p.is_dir(follow_symlinks=False):
-            user_name = pwd.getpwuid(p.stat().st_uid).pw_name
-            if result_dict.get(user_name):
-                result_dict[user_name].append(p)
-            else:
-                result_dict[user_name] = [p]
+    with open(input_list, "r") as inf:
+        for each in inf:
+            input_dir = Path(each.strip())
+            for p in input_dir.iterdir():
+                if p.is_dir(follow_symlinks=False):
+                    user_name = pwd.getpwuid(p.stat().st_uid).pw_name
+                    if result_dict.get(user_name):
+                        result_dict[user_name].append(p)
+                    else:
+                        result_dict[user_name] = [p]
     return result_dict
 
 def main():
@@ -31,7 +34,7 @@ def main():
         help='扫盘结果要输出的路径') 
     parser.add_argument('--list', '-l', dest="list", metavar='path_list', type=str, required=True,
         help='输入的要扫的目录的列表文件')
-    parser.add_argument('--out', '-o', des='out', metavar='config.yml', type=str, required=True,
+    parser.add_argument('--out', '-o', dest='out', metavar='config.yml', type=str, required=True,
         help='输出的config.yml文件')
     args = parser.parse_args()
     pipe_path = args.pipe
