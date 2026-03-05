@@ -10,12 +10,12 @@ import yaml
 
 def traverse_dir(input_list):
     "遍历目录,按key为属主将目录存放到字典中"
-    result_dict = []
+    result_dict = {}
     with open(input_list, "r") as inf:
         for each in inf:
             input_dir = Path(each.strip())
             for p in input_dir.iterdir():
-                if p.is_dir(follow_symlinks=False):
+                if p.is_dir():
                     user_name = pwd.getpwuid(p.stat().st_uid).pw_name
                     if result_dict.get(user_name):
                         result_dict[user_name].append(p)
