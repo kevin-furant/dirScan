@@ -27,57 +27,137 @@ long long getDuration(const fs::file_time_type & t1, const fs::file_time_type & 
 	auto seconds = std::chrono::duration_cast<std::chrono::seconds>(duration).count();
 	return seconds > 0 ? seconds : 0;
 }
+
+static void recordDenied(const fs::path & p, std::ofstream & fh) {
+	fh << p << '\n';
+}
+
 //fs namespace defined in header file.
-void traversalDir(fs::path aPath, std::ofstream & outf, std::ofstream & fh) {
-	fs::recursive_directory_iterator it(aPath, fs::directory_options::skip_permission_denied);
-	fs::recursive_directory_iterator end = fs::end(it);
+void traversalDir(const fs::path & aPath, std::ofstream & outf, std::ofstream & fh) {
+	std::error_code ec;
+	if (!fs::exists(aPath, ec) || ec) {
+		std::cerr << "Input path does not exist: " << aPath << std::endl;
+		recordDenied(aPath, fh);
+		return;
+	}
+	if (!fs::is_directory(aPath, ec) || ec) {
+		std::cerr << "Input path is not a directory: " << aPath << std::endl;
+		recordDenied(aPath, fh);
+		return;
+	}
+
+	fs::recursive_directory_iterator it(aPath, fs::directory_options::skip_permission_denied, ec);
+	if (ec) {
+		std::cerr << "Cannot open directory: " << aPath << " ; " << ec.message() << std::endl;
+		recordDenied(aPath, fh);
+		return;
+	}
+	fs::recursive_directory_iterator end;
 	using fs::perms;
 	while(it != end){
+		const fs::path currentPath = it->path();
 		try{
-			//if (it->is_symlink()) continue;
-			perms p = fs::status(*it).permissions();
+			std::error_code sec;
+			const fs::file_status status = it->symlink_status(sec);
+			if (sec) {
+				std::cerr << "Failed to read status: " << currentPath << " ; " << sec.message() << std::endl;
+				recordDenied(currentPath, fh);
+				sec.clear();
+				it.increment(sec);
+				if (sec) {
+					std::cerr << "Iterator increment failed: " << currentPath << " ; " << sec.message() << std::endl;
+				}
+				continue;
+			}
+
+			const perms p = status.permissions();
 			gid_t my_gid = getgid();
 			struct stat file_stat;
-			if (it->is_directory()){
-				if (stat(it->path().c_str(), &file_stat) == 0){
+			if (fs::is_directory(status)){
+				if (stat(currentPath.c_str(), &file_stat) == 0){
 					if (my_gid == file_stat.st_gid){
-						//in same group
 						if ((perms::none == (perms::group_read & p)) && (perms::none == (perms::group_exec & p))) {
-							fh << it->path() << std::endl;
+							recordDenied(currentPath, fh);
 						}
 					}else{
-						//not in same group
 						if ((perms::none == (perms::others_read & p)) && (perms::none == (perms::others_exec & p))) {
-							fh << it->path() << std::endl;
+							recordDenied(currentPath, fh);
 						}
 					}
 				}else {
-					std::cerr << "Fail to get entry's gid: " << it->path() << std::endl;					
+					std::cerr << "Fail to get entry's gid: " << currentPath << std::endl;
+					recordDenied(currentPath, fh);
 				}
 			}
-			if (it ->is_symlink()){
-				++it;
+
+			if (fs::is_symlink(status)){
+				std::error_code incEc;
+				it.increment(incEc);
+				if (incEc) {
+					std::cerr << "Iterator increment failed: " << currentPath << " ; " << incEc.message() << std::endl;
+					recordDenied(currentPath, fh);
+				}
 				continue;
 			}
-			if (it->is_regular_file()){
-				//if (perms::none == (perms::group_read & p)){
-				//	fh << it->path() << std::endl;
-				//}else {
-				const auto lastWriteTime = fs::last_write_time(*it);
-				const long long secondsDiff = getDuration(lastWriteTime, fs::file_time_type::clock::now());
-				const long long daysDiff = secondsDiff / (24 * 60 * 60);
-				outf << it->path() << "\t"
-					<< HumanReadable{it->file_size()} << "\t"
-					<< secondsDiff << "\t"
-					<< daysDiff << std::endl;
-				//}
+
+			if (fs::is_regular_file(status)){
+				std::error_code metaEc;
+				const auto fileSize = it->file_size(metaEc);
+				if (metaEc) {
+					std::cerr << "Failed to read file size: " << currentPath << " ; " << metaEc.message() << std::endl;
+					recordDenied(currentPath, fh);
+				} else {
+					const auto lastWriteTime = it->last_write_time(metaEc);
+					if (metaEc) {
+						std::cerr << "Failed to read mtime: " << currentPath << " ; " << metaEc.message() << std::endl;
+						recordDenied(currentPath, fh);
+					} else {
+						const long long secondsDiff = getDuration(lastWriteTime, fs::file_time_type::clock::now());
+						const long long daysDiff = secondsDiff / (24 * 60 * 60);
+						outf << currentPath << "\t"
+							<< HumanReadable{fileSize} << "\t"
+							<< secondsDiff << "\t"
+							<< daysDiff << std::endl;
+					}
+				}
 			}
-			++it;
+
+			std::error_code incEc;
+			it.increment(incEc);
+			if (incEc) {
+				std::cerr << "Iterator increment failed: " << currentPath << " ; " << incEc.message() << std::endl;
+				recordDenied(currentPath, fh);
+			}
 		} catch (const fs::filesystem_error & err){
 			std::cerr << err.what() << std::endl;
-			//fh << err.path1() << std::endl;
+			if (!currentPath.empty()) {
+				recordDenied(currentPath, fh);
+			}
 			std::error_code rc;
 			it.increment(rc);
+			if (rc && !currentPath.empty()) {
+				recordDenied(currentPath, fh);
+			}
+		} catch (const std::exception & err) {
+			std::cerr << "Unexpected error on path " << currentPath << " : " << err.what() << std::endl;
+			if (!currentPath.empty()) {
+				recordDenied(currentPath, fh);
+			}
+			std::error_code rc;
+			it.increment(rc);
+			if (rc && !currentPath.empty()) {
+				recordDenied(currentPath, fh);
+			}
+		} catch (...) {
+			std::cerr << "Unknown error on path " << currentPath << std::endl;
+			if (!currentPath.empty()) {
+				recordDenied(currentPath, fh);
+			}
+			std::error_code rc;
+			it.increment(rc);
+			if (rc && !currentPath.empty()) {
+				recordDenied(currentPath, fh);
+			}
 		}
 	}
 }
