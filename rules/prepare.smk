@@ -3,7 +3,6 @@ from pathlib import Path
 #from datetime import datetime
 
 configfile: "/public/work/Personal/fuxiangke/pipeline/userDirScanner/config.yml"
-#current_date = datetime.now().strftime('%Y-%m-%d')
 
 def get_last_part(path):
     return os.path.basename(path)
@@ -57,8 +56,12 @@ rule dirScanner:
         scanner = Path(config["pipe_path"]) / "script" / "userDirScanner" / "userDirScanner"
     shell:
         """
-        path=$(cat {input} | tr '\n' ' ')
-        {params.scanner} $path {output}
+        path=$(cat {input} | tr -d ' \\n\\r')
+        if [ -e $path ];then
+            {params.scanner} $path {output}
+        else
+            touch {output}
+        fi 
         """
 
 rule resultStat:
