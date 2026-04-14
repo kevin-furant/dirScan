@@ -32,12 +32,13 @@ def main():
     ]
 
     disk_names = [
-        "disk_1", "disk_2", "disk_3", "disk_4", "disk_5"
+        # "disk_1", "disk_2", "disk_3", "disk_4", "disk_5"
+        "public_Personal", "public_Project", "public2_Project", "public3_Project", "public4_Project"
     ]
 
     disk_dict = dict(zip(disk_prefix, disk_names))
     df = pd.read_csv(input_merge_ds_tsv, sep="\t", header=None, names=["Path", "Size", "Seconds", "Days"])
-    output_path = Path(output_dir) / "disk_category"
+    output_path = Path(output_dir)
     if not output_path.exists():
         output_path.mkdir(mode=0o755, parents=True, exist_ok=True)
     df["Path"] = df["Path"].replace('"', '')

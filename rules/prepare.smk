@@ -25,7 +25,7 @@ def generate_input_files(wildcards):
         "ds_tsv": expand("{workdir}/{current_date}/{user}/{subdir}_{index}.ds.tsv", zip, workdir=[config["workdir"]] * l, current_date=[current_date] * l, user=[user] * l, subdir=subdirs, index=indices),
         "ds_permission_tsv": expand("{workdir}/{current_date}/{user}/{subdir}_{index}.ds.permission_denied.tsv", zip, workdir=[config["workdir"]] * l, current_date=[current_date] * l, user=[user] * l, subdir=subdirs, index=indices)
     }
- 
+
 rule createDirAndFiles:
     output:
         "{workdir}/{current_date}/{user}/{subdir}_{index}.tsv"
@@ -74,10 +74,13 @@ rule resultStat:
         workdir = config["workdir"],
         user = lambda wildcards: wildcards.user,
         current_date = lambda wildcards: wildcards.current_date,
-        retstat = Path(config["pipe_path"]) / "script" / "dirScanResultStat.pl"
+        retstat = Path(config["pipe_path"]) / "script" / "dirScanResultStat.pl",
+        python = config["python"],
+        py_disk_summary = Path(config["pipe_path"]) / "script" / "classify_ds_result.py"
     shell:
         """
         cat {input.ds_tsv} > {params.workdir}/{params.current_date}/{params.user}/merge.ds.tsv
         cat {input.ds_permission_tsv} > {params.workdir}/{params.current_date}/{params.user}/merge.permission.tsv
         perl {params.retstat} {wildcards.user} {params.workdir}/{params.current_date}/{params.user}/merge.ds.tsv 365
+        {params.python} {params.py_disk_summary} {wildcards.user} {params.workdir}/{params.current_date}/{params.user}/merge.ds.tsv {params.workdir}/{params.current_date}/{params.user}
         """

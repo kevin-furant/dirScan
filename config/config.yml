@@ -1,5 +1,6 @@
 workdir: /public/work/Personal/fuxiangke/dirScan
 pipe_path: /public/work/Personal/fuxiangke/pipeline/userDirScanner
+python: /public/work/Personal/fuxiangke/software/Miniconda3/envs/snakemake_env/bin/python3
 targetDir:
     bijinpeng:
     - /public/work/Personal/bijinpeng
