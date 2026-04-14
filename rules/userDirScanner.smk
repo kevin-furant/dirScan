@@ -25,4 +25,5 @@ include: Path(config["pipe_path"]) / "rules" / "prepare.smk"
 rule all:
     input:
         get_output_files(),
-        expand("{workdir}/{current_date}/{user}/report.md", workdir=config["workdir"], current_date=current_date, user=config["targetDir"].keys())
+        expand("{workdir}/{current_date}/{user}/report.md", workdir=config["workdir"], current_date=current_date, user=config["targetDir"].keys()),
+        expand("{workdir}/{current_date}/{user}/{user}.disk_category.tsv", workdir=config["workdir"], current_date=current_date, user=config["targetDir"].keys())
