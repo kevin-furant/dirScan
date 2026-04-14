@@ -72,7 +72,8 @@ rule resultStat:
         vcf_tsv = "{workdir}/{current_date}/{user}/vcf.tsv",
         fq_tsv = "{workdir}/{current_date}/{user}/fastq.tsv",
         bam_tsv = "{workdir}/{current_date}/{user}/bam.tsv",
-        report_md = "{workdir}/{current_date}/{user}/report.md"
+        report_md = "{workdir}/{current_date}/{user}/report.md",
+        disk_summary = "{workdir}/{current_date}/{user}/{user}.disk_category.tsv"
     params:
         workdir = config["workdir"],
         user = lambda wildcards: wildcards.user,
