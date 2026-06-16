@@ -43,6 +43,14 @@ rule createDirAndFiles:
         echo {params.path} > {output}
         """
 
+def _get_partition(wildcards, input):
+    """根据路径前缀设置 partition，/public4 路径投递到 node02,node03"""
+    with open(input[0]) as f:
+        path = f.read().strip()
+    if path.startswith("/public4"):
+        return "node02,node03"
+    return "node02,node03,node04,node05,node01"
+
 rule dirScanner:
     input:
         "{workdir}/{current_date}/{user}/{subdir}_{index}.tsv"
@@ -54,6 +62,8 @@ rule dirScanner:
     params:
         workdir = config["workdir"],
         scanner = Path(config["pipe_path"]) / "script" / "userDirScanner" / "userDirScanner"
+    resources:
+        partition=_get_partition
     shell:
         """
         path=$(cat {input} | tr -d ' \\n\\r')
