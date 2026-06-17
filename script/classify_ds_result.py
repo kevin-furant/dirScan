@@ -3,6 +3,7 @@ import sys, os
 import pandas as pd
 from pathlib import Path
 import re
+from tabulate import tabulate
 
 def get_disk_info(x, _dict):
     prefix = "/".join(x.split("/", 4)[:4])
@@ -58,8 +59,17 @@ def main():
         else:
             result_dict[each] = 0
     user_out_df = pd.Series(result_dict, name=user_name).to_frame().T
+    formatted_table = tabulate(
+        user_out_df,
+        headers="keys",
+        tablefmt="tsv",
+        stralign="left",
+        numalign="left"
+    )
     out_stat_result = output_path / (user_name + ".disk_category.tsv")
-    user_out_df.to_csv(out_stat_result, sep="\t")
+    # user_out_df.to_csv(out_stat_result, sep="\t")
+    with open(out_stat_result, "w", encoding="utf-8") as f:
+        f.write(formatted_table)
 
 if __name__ == "__main__":
     main()
